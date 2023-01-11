@@ -17,13 +17,13 @@ struct ContentView: View {
     private static let appleParkLongitude = -122.009_020
     private static let meters = 750.0
 
-    @State private var region = MKCoordinateRegion(
-        center: CLLocationCoordinate2D(
-            latitude: Self.appleParkLatitude,
-            longitude: Self.appleParkLongitude
-        ),
-        latitudinalMeters: Self.meters,
-        longitudinalMeters: Self.meters
+    @State private var initialCenter = CLLocationCoordinate2D(
+        latitude: Self.appleParkLatitude,
+        longitude: Self.appleParkLongitude
+    )
+    @State private var currentCenter = CLLocationCoordinate2D(
+        latitude: Self.appleParkLatitude,
+        longitude: Self.appleParkLongitude
     )
 
     @StateObject var locationManager = LocationManager()
@@ -36,7 +36,8 @@ struct ContentView: View {
     func panToCurrentLocation() {
         guard let location = locationManager.location else { return }
         Task { @MainActor in
-            region.center = location
+            initialCenter = location
+            currentCenter = location
         }
     }
 
@@ -58,13 +59,13 @@ struct ContentView: View {
 
             // Display the current location.
             // This updates if the user pans the map.
-            let center = region.center
-            Text("Lat: \(center.latitude), Lng: \(center.longitude)")
+            let lat = currentCenter.latitude
+            let lng = currentCenter.longitude
+            Text("Lat: \(lat), Lng: \(lng)")
 
-            // A binding must be passed so it can be
-            // modified if the user pans or zooms the map.
-            // Map(coordinateRegion: $region, showsUserLocation: true)
-            MapView(center: region.center, distance: 2000)
+            // A binding must be passed for currentCenter so it
+            // can be modified if the user pans or zooms the map.
+            MapView(initialCenter: initialCenter, currentCenter: $currentCenter)
 
             Spacer()
         }
