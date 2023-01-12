@@ -12,33 +12,27 @@ extension CLLocationCoordinate2D: Equatable {
     }
 }
 
+private let appleParkLatitude = 37.334_900
+private let appleParkLongitude = -122.009_020
+
 struct ContentView: View {
-    private static let appleParkLatitude = 37.334_900
-    private static let appleParkLongitude = -122.009_020
-    private static let meters = 750.0
+    @StateObject private var locationManager = LocationManager.shared
 
-    @State private var initialCenter = CLLocationCoordinate2D(
-        latitude: Self.appleParkLatitude,
-        longitude: Self.appleParkLongitude
+    @State var initialCenter = CLLocationCoordinate2D(
+        latitude: appleParkLatitude,
+        longitude: appleParkLongitude
     )
-    @State private var currentCenter = CLLocationCoordinate2D(
-        latitude: Self.appleParkLatitude,
-        longitude: Self.appleParkLongitude
-    )
-
-    @StateObject var locationManager = LocationManager()
+    @State var currentCenter: CLLocationCoordinate2D?
 
     init() {
-        // This has no effect.
+        // Other options are .standard and .satellite.
         MKMapView.appearance().mapType = .hybrid
     }
 
     func panToCurrentLocation() {
-        guard let location = locationManager.location else { return }
-        Task { @MainActor in
-            initialCenter = location
-            currentCenter = location
-        }
+        guard let location = locationManager.userLocation else { return }
+        print("panToCurrentLocation: location =", location)
+        initialCenter = location
     }
 
     var body: some View {
@@ -49,7 +43,7 @@ struct ContentView: View {
                 }
                 .foregroundColor(.white) // defaults to black
                 Spacer()
-                if locationManager.location != nil {
+                if locationManager.userLocation != nil {
                     Button("Return") {
                         panToCurrentLocation()
                     }
@@ -59,18 +53,23 @@ struct ContentView: View {
 
             // Display the current location.
             // This updates if the user pans the map.
-            let lat = currentCenter.latitude
-            let lng = currentCenter.longitude
-            Text("Lat: \(lat), Lng: \(lng)")
+            if let c = currentCenter {
+                Text("Lat: \(c.latitude), Lng: \(c.longitude)")
+            }
 
-            // A binding must be passed for currentCenter so it
-            // can be modified if the user pans or zooms the map.
-            MapView(initialCenter: initialCenter, currentCenter: $currentCenter)
+            // MapView does not change the value of `initialCenter`,
+            // so we do not pass a Binding.
+            // MapView does change the value of `currentCenter`,
+            // so we pass a Binding.
+            MapView(
+                initialCenter: initialCenter,
+                currentCenter: $currentCenter
+            )
 
             Spacer()
         }
         .padding()
-        .onChange(of: locationManager.location) { _ in
+        .onChange(of: locationManager.userLocation) { _ in
             panToCurrentLocation()
         }
     }

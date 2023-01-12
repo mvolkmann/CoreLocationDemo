@@ -1,12 +1,18 @@
 import CoreLocation
 import SwiftUI
 
+private let appleParkLatitude = 37.334_900
+private let appleParkLongitude = -122.009_020
+
 class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var error: Error?
-    @Published var location: CLLocationCoordinate2D?
+    @Published var userLocation: CLLocationCoordinate2D?
+
     let manager = CLLocationManager()
 
-    override init() {
+    static var shared = LocationManager()
+
+    override private init() {
         super.init()
         manager.delegate = self
     }
@@ -19,7 +25,7 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         _ manager: CLLocationManager,
         didUpdateLocations locations: [CLLocation]
     ) {
-        location = locations.first?.coordinate
+        userLocation = locations.first?.coordinate
     }
 
     func locationManager(
