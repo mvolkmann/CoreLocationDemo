@@ -18,11 +18,13 @@ private let appleParkLongitude = -122.009_020
 struct ContentView: View {
     @StateObject private var locationManager = LocationManager.shared
 
-    @State var initialCenter = CLLocationCoordinate2D(
+    @State private var currentCenter: CLLocationCoordinate2D?
+    @State private var initialCenter = CLLocationCoordinate2D(
         latitude: appleParkLatitude,
         longitude: appleParkLongitude
     )
-    @State var currentCenter: CLLocationCoordinate2D?
+    // @State var currentCenter: CLLocationCoordinate2D?
+    @State private var mapView: MKMapView?
 
     init() {
         // Other options are .standard and .satellite.
@@ -37,6 +39,7 @@ struct ContentView: View {
 
     var body: some View {
         VStack {
+            let _ = print("updating body")
             HStack {
                 LocationButton {
                     locationManager.requestLocation()
@@ -63,14 +66,23 @@ struct ContentView: View {
             // so we pass a Binding.
             MapView(
                 initialCenter: initialCenter,
-                currentCenter: $currentCenter
+                // currentCenter: $currentCenter
+                mapView: $mapView
             )
 
             Spacer()
         }
         .padding()
+
         .onChange(of: locationManager.userLocation) { _ in
             panToCurrentLocation()
+        }
+
+        // TODO: mapView and centerCoordinate are not @Published,
+        // so this doesn't trigger.
+        .onChange(of: mapView?.centerCoordinate) { center in
+            print("center =", center)
+            currentCenter = center
         }
     }
 }

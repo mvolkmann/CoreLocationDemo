@@ -17,24 +17,26 @@ struct MapView: UIViewRepresentable {
     typealias UIViewType = MKMapView
 
     let initialCenter: CLLocationCoordinate2D
-    @Binding var currentCenter: CLLocationCoordinate2D?
+    // @Binding var currentCenter: CLLocationCoordinate2D?
+    @Binding var mapView: MKMapView?
 
     // This is required to conform to UIViewRepresentable.
     func makeUIView(context: Context) -> UIViewType {
-        let mapView = UIViewType()
-        mapView.delegate = context.coordinator
+        let mv = UIViewType()
+        Task { @MainActor in mapView = mv }
+        mv.delegate = context.coordinator
 
         let meters = 750.0
-        mapView.region = MKCoordinateRegion(
+        mv.region = MKCoordinateRegion(
             center: initialCenter,
             latitudinalMeters: meters,
             longitudinalMeters: meters
         )
 
         // Add a blue circle over the current user location.
-        mapView.showsUserLocation = true
+        mv.showsUserLocation = true
 
-        return mapView
+        return mv
     }
 
     // This is called initially and again every time
@@ -47,34 +49,43 @@ struct MapView: UIViewRepresentable {
     // This is required to conform to UIViewRepresentable.
     func makeCoordinator() -> Coordinator {
         // Coordinator(self)
-        Coordinator(center: $currentCenter)
+        // Coordinator(center: $currentCenter)
+        Coordinator()
     }
 
     class Coordinator: NSObject, MKMapViewDelegate {
         // Old approach:
-        // var parent: MapView
-        // init(_ parent: MapView) {
-        //     self.parent = parent
-        // }
+        /*
+         var parent: MapView
+         init(_ parent: MapView) {
+             self.parent = parent
+         }
+         */
 
         // New approach:
-        @Binding var center: CLLocationCoordinate2D?
-        init(center: Binding<CLLocationCoordinate2D?>) {
-            // The underscore is needed to set the wrapped value of a Binding.
-            _center = center
-        }
+        /*
+         @Binding var center: CLLocationCoordinate2D?
+         init(center: Binding<CLLocationCoordinate2D?>) {
+             // The underscore is needed to set the wrapped value of a Binding.
+             _center = center
+         }
+         */
 
         // This is called when the user drags the map.
-        func mapViewDidChangeVisibleRegion(_ mapView: UIViewType) {
-            print("new center =", mapView.centerCoordinate)
-            Task { @MainActor in
-                // Old approach:
-                // parent.currentCenter = mapView.centerCoordinate
+        func mapViewDidChangeVisibleRegion(_: UIViewType) {
+            // print("new center =", mapView.centerCoordinate)
+            /*
+             Task { @MainActor in
+                 // Old approach:
+                 // parent.currentCenter = mapView.centerCoordinate
 
-                // New approach:
-                // TODO: Why does setting this break the ability to pan the map?
-                // center = mapView.centerCoordinate
-            }
+                 // New approach:
+                 // TODO: Why does setting this break the ability to pan the map?
+                 // Is it because the MapView instance gets recreated
+                 // and reverts back to the initialCenter?
+                 center = mapView.centerCoordinate
+             }
+             */
         }
     }
 }
