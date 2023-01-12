@@ -6,6 +6,7 @@ private let appleParkLongitude = -122.009_020
 
 class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var error: Error?
+    @Published var mapCenter: CLLocationCoordinate2D?
     @Published var userLocation: CLLocationCoordinate2D?
 
     let manager = CLLocationManager()

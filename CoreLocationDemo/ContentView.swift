@@ -33,13 +33,11 @@ struct ContentView: View {
 
     func panToCurrentLocation() {
         guard let location = locationManager.userLocation else { return }
-        print("panToCurrentLocation: location =", location)
         initialCenter = location
     }
 
     var body: some View {
         VStack {
-            let _ = print("updating body")
             HStack {
                 LocationButton {
                     locationManager.requestLocation()
@@ -56,33 +54,18 @@ struct ContentView: View {
 
             // Display the current location.
             // This updates if the user pans the map.
-            if let c = currentCenter {
+            // TODO: How can this update without also updating MapView below?
+            if let c = locationManager.mapCenter {
                 Text("Lat: \(c.latitude), Lng: \(c.longitude)")
             }
 
-            // MapView does not change the value of `initialCenter`,
-            // so we do not pass a Binding.
-            // MapView does change the value of `currentCenter`,
-            // so we pass a Binding.
-            MapView(
-                initialCenter: initialCenter,
-                // currentCenter: $currentCenter
-                mapView: $mapView
-            )
+            MapView(initialCenter: initialCenter)
 
             Spacer()
         }
         .padding()
-
         .onChange(of: locationManager.userLocation) { _ in
             panToCurrentLocation()
-        }
-
-        // TODO: mapView and centerCoordinate are not @Published,
-        // so this doesn't trigger.
-        .onChange(of: mapView?.centerCoordinate) { center in
-            print("center =", center)
-            currentCenter = center
         }
     }
 }
