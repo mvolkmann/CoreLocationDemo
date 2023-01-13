@@ -53,6 +53,14 @@ struct MapView: UIViewRepresentable {
     }
 
     class Coordinator: NSObject, MKMapViewDelegate {
+        /*
+         private var parent: MapView
+
+         init(_ parent: MapView) {
+             self.parent = parent
+         }
+         */
+
         // This is called when the user drags the map.
         func mapViewDidChangeVisibleRegion(_ mapView: UIViewType) {
             Task { @MainActor in
