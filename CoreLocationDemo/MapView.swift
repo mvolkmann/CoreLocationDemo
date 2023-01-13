@@ -20,6 +20,9 @@ struct MapView: UIViewRepresentable {
 
     // This is required to conform to UIViewRepresentable.
     func makeUIView(context: Context) -> UIViewType {
+        // Other options are .standard and .satellite.
+        MKMapView.appearance().mapType = .hybrid
+
         let mapView = UIViewType()
         mapView.delegate = context.coordinator
 

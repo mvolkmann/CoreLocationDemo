@@ -7,6 +7,10 @@ private let appleParkLongitude = -122.009_020
 class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var error: Error?
     @Published var mapCenter: CLLocationCoordinate2D?
+    @Published var initialCenter = CLLocationCoordinate2D(
+        latitude: appleParkLatitude,
+        longitude: appleParkLongitude
+    )
     @Published var userLocation: CLLocationCoordinate2D?
 
     let manager = CLLocationManager()
@@ -18,15 +22,12 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         manager.delegate = self
     }
 
-    func requestLocation() {
-        manager.requestLocation()
-    }
-
     func locationManager(
         _ manager: CLLocationManager,
         didUpdateLocations locations: [CLLocation]
     ) {
         userLocation = locations.first?.coordinate
+        initialCenter = userLocation!
     }
 
     func locationManager(
@@ -34,5 +35,15 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         didFailWithError error: Error
     ) {
         self.error = error
+    }
+
+    func requestLocation() {
+        manager.requestLocation()
+    }
+
+    func reset() {
+        if let userLocation {
+            initialCenter = userLocation
+        }
     }
 }
