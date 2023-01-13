@@ -3,7 +3,8 @@ import SwiftUI
 
 /**
  For now we have to wrap an MKMapView in a UIViewRepresentable
- in order to use some MapKit features in SwiftUI.
+ in order to use some MapKit features in SwiftUI
+ such as displaying satellite images.
 
  I was getting the error "The following Metal object is being
  destroyed while still required to be alive by the command buffer".
@@ -18,9 +19,9 @@ struct MapView: UIViewRepresentable {
 
     let initialCenter: CLLocationCoordinate2D
 
-    // This is required to conform to UIViewRepresentable.
+    // This method is required to conform to UIViewRepresentable.
     func makeUIView(context: Context) -> UIViewType {
-        // Other options are .standard and .satellite.
+        // Other `mapType` options are `.standard` and `.satellite`.
         MKMapView.appearance().mapType = .hybrid
 
         let mapView = UIViewType()
@@ -48,11 +49,13 @@ struct MapView: UIViewRepresentable {
 
     // This is required to conform to UIViewRepresentable.
     func makeCoordinator() -> Coordinator {
+        // Use this if `Coordinator` needs access to its parent.
         // Coordinator(self)
         Coordinator()
     }
 
     class Coordinator: NSObject, MKMapViewDelegate {
+        // Use this if access to the parent is needed.
         /*
          private var parent: MapView
 
