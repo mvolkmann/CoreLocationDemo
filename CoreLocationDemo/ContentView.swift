@@ -16,7 +16,7 @@ struct ContentView: View {
                 Spacer()
                 if locationManager.userLocation != nil {
                     Button("Return") {
-                        locationManager.reset()
+                        locationManager.panToUserLocation()
                     }
                     .buttonStyle(.bordered)
                 }

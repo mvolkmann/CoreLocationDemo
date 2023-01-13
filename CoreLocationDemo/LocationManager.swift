@@ -37,11 +37,7 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         self.error = error
     }
 
-    func requestLocation() {
-        manager.requestLocation()
-    }
-
-    func reset() {
+    func panToUserLocation() {
         if let userLocation {
             // If the initial map center is already at the user location ...
             if initialCenter == userLocation {
@@ -52,5 +48,9 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
                 initialCenter = userLocation
             }
         }
+    }
+
+    func requestLocation() {
+        manager.requestLocation()
     }
 }
