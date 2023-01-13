@@ -8,22 +8,18 @@ struct ContentView: View {
 
     var body: some View {
         VStack {
-            HStack {
+            if locationManager.userLocation == nil {
                 // Tap this to get the device location and pan the map to it.
                 LocationButton {
                     locationManager.requestLocation()
                 }
                 .foregroundColor(.white) // defaults to black
-
-                Spacer()
-
-                if locationManager.userLocation != nil {
-                    // Tap this to reset the map to the device location.
-                    Button("Reset") {
-                        locationManager.panToDeviceLocation()
-                    }
-                    .buttonStyle(.bordered)
+            } else {
+                // Tap this to reset the map to the device location.
+                Button("Reset") {
+                    locationManager.panToDeviceLocation()
                 }
+                .buttonStyle(.bordered)
             }
 
             // This updates if the user drags the map.
