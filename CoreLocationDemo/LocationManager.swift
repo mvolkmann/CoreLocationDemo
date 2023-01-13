@@ -43,7 +43,14 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
 
     func reset() {
         if let userLocation {
-            initialCenter = userLocation
+            // If the initial map center is already at the user location ...
+            if initialCenter == userLocation {
+                // Change it slightly to try `MapView` to re-render.
+                initialCenter.longitude += 0.0000001
+            } else {
+                // Go to the user location.
+                initialCenter = userLocation
+            }
         }
     }
 }
